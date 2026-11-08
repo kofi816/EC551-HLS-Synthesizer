@@ -1,4 +1,5 @@
 X=A+B
-Y=X+A
-Z=X-B
-Q=B*Z
+X=X+C
+Y=X*D
+X=Y-A
+Z=X+B
