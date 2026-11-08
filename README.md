@@ -170,6 +170,16 @@ Ran 11 tests in 0.00Xs
 OK
 ```
 
+DAG
+test with 
+python3 hls/dag.py inputs/equations.txt
+
+python3 hls/dag.py inputs/equations.txt --export-dag dag.json
+
+python3 test/test_dag.py -v
+
+python3 -m unittest discover -s test -p "test_*.py" -v
+
 ### 7. Frontend Processing Pipeline
 
 ```text

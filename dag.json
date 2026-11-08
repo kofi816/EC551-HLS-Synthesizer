@@ -1,0 +1,40 @@
+{
+  "X_1": {
+    "operator": "+",
+    "operands": [
+      "A",
+      "B"
+    ],
+    "dependencies": []
+  },
+  "Y_1": {
+    "operator": "+",
+    "operands": [
+      "X_1",
+      "A"
+    ],
+    "dependencies": [
+      "X_1"
+    ]
+  },
+  "Z_1": {
+    "operator": "-",
+    "operands": [
+      "X_1",
+      "B"
+    ],
+    "dependencies": [
+      "X_1"
+    ]
+  },
+  "Q_1": {
+    "operator": "*",
+    "operands": [
+      "B",
+      "Z_1"
+    ],
+    "dependencies": [
+      "Z_1"
+    ]
+  }
+}
