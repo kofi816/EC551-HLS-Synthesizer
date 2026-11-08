@@ -180,6 +180,14 @@ python3 test/test_dag.py -v
 
 python3 -m unittest discover -s test -p "test_*.py" -v
 
+
+ASAP Scheduling
+python3 hls/scheduling/asap.py inputs/equations.txt
+
+python3 test/test_asap.py -v
+
+python3 -m unittest discover -s test -p "test_*.py" -v
+
 ### 7. Frontend Processing Pipeline
 
 ```text
