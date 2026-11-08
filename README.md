@@ -188,6 +188,76 @@ python3 test/test_asap.py -v
 
 python3 -m unittest discover -s test -p "test_*.py" -v
 
+
+## Verilog Arithmetic Unit Testing
+
+The arithmetic functional units are implemented in Verilog:
+
+- `rtl/adder.v` — 16-bit addition
+- `rtl/subtractor.v` — 16-bit subtraction
+- `rtl/multiplier.v` — 16-bit multiplication
+
+The testbench `testbench/tb_arithmetic.v` instantiates all three RTL modules and verifies their outputs.
+
+### 1. Install Icarus Verilog
+
+On macOS, install Icarus Verilog using MacPorts:
+
+```bash
+sudo port install iverilog
+```
+
+Verify the installation:
+
+```bash
+iverilog -V
+```
+
+### 2. Compile the Testbench
+
+From the project root, run:
+
+```bash
+iverilog -g2012 -s tb_arithmetic -o /tmp/tb_arithmetic.vvp rtl/adder.v rtl/subtractor.v rtl/multiplier.v testbench/tb_arithmetic.v
+```
+
+This compiles the three arithmetic RTL modules together with the testbench.
+
+### 3. Run the Simulation
+
+```bash
+vvp /tmp/tb_arithmetic.vvp
+```
+
+Expected output:
+
+```text
+PASS: 333 arithmetic checks passed
+```
+
+### 4. Test Coverage
+
+The testbench evaluates:
+
+- 11 directed input combinations
+- 100 random input combinations
+- Addition, subtraction, and multiplication
+- Zero operands
+- Overflow and underflow
+- 16-bit multiplication result truncation
+
+Each input combination tests all three arithmetic modules.
+
+Total checks:
+
+```text
+111 input combinations × 3 operations = 333 checks
+```
+
+All 333 checks passed using Icarus Verilog.
+
+These tests verify the combinational functionality of the arithmetic units. FPGA synthesis, timing verification, and clocked datapath integration are separate steps.
+
 ### 7. Frontend Processing Pipeline
 
 ```text
