@@ -188,6 +188,101 @@ python3 test/test_asap.py -v
 
 python3 -m unittest discover -s test -p "test_*.py" -v
 
+
+## Verilog Arithmetic Unit Testing
+
+The arithmetic functional units are implemented in Verilog:
+
+- `rtl/adder.v` — 16-bit addition
+- `rtl/subtractor.v` — 16-bit subtraction
+- `rtl/multiplier.v` — 16-bit multiplication
+
+The testbench `testbench/tb_arithmetic.v` instantiates all three RTL modules and verifies their outputs.
+
+### 1. Install Icarus Verilog
+
+On macOS, install Icarus Verilog using MacPorts:
+
+```bash
+sudo port install iverilog
+```
+
+Verify the installation:
+
+```bash
+iverilog -V
+```
+
+### 2. Compile the Testbench
+
+From the project root, run:
+
+```bash
+iverilog -g2012 -s tb_arithmetic -o /tmp/tb_arithmetic.vvp rtl/adder.v rtl/subtractor.v rtl/multiplier.v testbench/tb_arithmetic.v
+```
+
+This compiles the three arithmetic RTL modules together with the testbench.
+
+### 3. Run the Simulation
+
+```bash
+vvp /tmp/tb_arithmetic.vvp
+```
+
+Expected output:
+
+```text
+PASS: 333 arithmetic checks passed
+```
+
+
+iverilog -g2012 -s tb_arithmetic_unit \
+-o /tmp/tb_arithmetic_unit.vvp \
+rtl/adder.v \
+rtl/subtractor.v \
+rtl/multiplier.v \
+rtl/arithmetic_unit.v \
+testbench/tb_arithmetic_unit.v
+
+vvp /tmp/tb_arithmetic_unit.vvp
+
+
+for manual clock steppin
+iverilog -g2012 -s tb_manual_clk_step \
+-o /tmp/tb_manual_clk_step.vvp \
+rtl/manual_clk_step.v \
+testbench/tb_manual_clk_step.v
+
+vvp /tmp/tb_manual_clk_step.vvp
+
+
+### 4. Test Coverage
+
+The testbench evaluates:
+
+- 11 directed input combinations
+- 100 random input combinations
+- Addition, subtraction, and multiplication
+- Zero operands
+- Overflow and underflow
+- 16-bit multiplication result truncation
+
+Each input combination tests all three arithmetic modules.
+
+Total checks:
+
+```text
+111 input combinations × 3 operations = 333 checks
+```
+
+All 333 checks passed using Icarus Verilog.
+
+These tests verify the combinational functionality of the arithmetic units. FPGA synthesis, timing verification, and clocked datapath integration are separate steps.
+
+
+python3 main.py inputs/equations.txt --json
+python3 -m unittest discover -s test -p "test_*.py" -v
+
 ### 7. Frontend Processing Pipeline
 
 ```text
@@ -214,6 +309,45 @@ python3 -m unittest discover -s test -p "test_*.py" -v
           v
    Verilog Generator
 ```
+
+               INPUT EQUATIONS
+                      |
+                      v
+                 PARSER
+                      |
+                      v
+                  SSA
+                      |
+                      v
+                   DAG
+                      |
+                      v
+              SCHEDULER
+             /         \
+          ASAP        ALAP
+             \         /
+              v       v
+           RESOURCE BINDING
+                   |
+                   v
+             RTL GENERATOR
+                   |
+                   v
+        +-----------------------+
+        | Generated Verilog RTL |
+        |                       |
+        | Arithmetic units      |
+        | Registers             |
+        | Multiplexers          |
+        | Control FSM           |
+        +-----------------------+
+                   |
+                   v
+             SIMULATION
+                   |
+                   v
+            FPGA IMPLEMENTATION
+
 
 The parser and SSA modules use the same dictionary structure, allowing SSA output to be passed directly to the DAG builder.
 Team Split
@@ -250,3 +384,35 @@ Shared
 
 
 
+    EC551-HLS-Synthesizer/
+│
+├── main.py                 # Main CLI entry point
+├── README.md
+│
+├── inputs/
+│   └── equations.txt
+│
+├── hls/
+│   ├── parser.py
+│   ├── ssa.py
+│   ├── dag.py
+│   ├── scheduling/
+│   │   ├── asap.py
+│   │   ├── alap.py
+│   │   └── ...
+│   └── ...
+│
+├── rtl/
+│   ├── adder.v
+│   ├── subtractor.v
+│   ├── multiplier.v
+│   ├── arithmetic_unit.v
+│   └── manual_clk_step.v
+│
+├── test/
+│   └── ...
+│
+└── testbench/
+    ├── tb_arithmetic.v
+    ├── tb_arithmetic_unit.v
+    └── tb_manual_clk_step.v
