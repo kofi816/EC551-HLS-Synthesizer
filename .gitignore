@@ -218,3 +218,10 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Vivado simulator build products
+xsim.dir/
+.Xil/
+*.jou
+xvlog.pb
+xelab.pb
