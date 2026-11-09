@@ -11,6 +11,7 @@ module generated_design #(parameter WIDTH = 8) (
     output reg [WIDTH-1:0] debug_fu_0,
     output reg [WIDTH-1:0] debug_fu_1,
     output reg [WIDTH-1:0] debug_fu_2,
+    output reg [WIDTH-1:0] debug_fu_3,
     input wire [WIDTH-1:0] in_A,
     input wire [WIDTH-1:0] in_B,
     input wire [WIDTH-1:0] in_C,
@@ -26,7 +27,7 @@ module generated_design #(parameter WIDTH = 8) (
     output wire [WIDTH-1:0] out_OUT_1
 );
 localparam IDLE = 0;
-localparam FINISH = 6;
+localparam FINISH = 5;
 reg [2:0] state;
 reg [WIDTH-1:0] input_0;
 reg [WIDTH-1:0] input_1;
@@ -51,13 +52,18 @@ hls_adder #(.WIDTH(WIDTH)) fu_0 (
 reg [WIDTH-1:0] fu_1_a;
 reg [WIDTH-1:0] fu_1_b;
 wire [WIDTH-1:0] fu_1_result;
-hls_multiplier #(.WIDTH(WIDTH)) fu_1 (
+hls_adder #(.WIDTH(WIDTH)) fu_1 (
     .a(fu_1_a), .b(fu_1_b), .result(fu_1_result));
 reg [WIDTH-1:0] fu_2_a;
 reg [WIDTH-1:0] fu_2_b;
 wire [WIDTH-1:0] fu_2_result;
-hls_subtractor #(.WIDTH(WIDTH)) fu_2 (
+hls_multiplier #(.WIDTH(WIDTH)) fu_2 (
     .a(fu_2_a), .b(fu_2_b), .result(fu_2_result));
+reg [WIDTH-1:0] fu_3_a;
+reg [WIDTH-1:0] fu_3_b;
+wire [WIDTH-1:0] fu_3_result;
+hls_subtractor #(.WIDTH(WIDTH)) fu_3 (
+    .a(fu_3_a), .b(fu_3_b), .result(fu_3_result));
 
 // FSM-controlled operand multiplexers.
 always @(*) begin
@@ -67,24 +73,24 @@ always @(*) begin
     fu_1_b = 0;
     fu_2_a = 0;
     fu_2_b = 0;
+    fu_3_a = 0;
+    fu_3_b = 0;
     case (state)
         1: begin
             fu_0_a = input_0;
             fu_0_b = input_1;
+            fu_1_a = input_2;
+            fu_1_b = input_3;
         end
         2: begin
-            fu_0_a = input_2;
-            fu_0_b = input_3;
+            fu_2_a = value_0;
+            fu_2_b = value_1;
         end
         3: begin
-            fu_1_a = value_0;
-            fu_1_b = value_1;
+            fu_3_a = value_2;
+            fu_3_b = value_0;
         end
         4: begin
-            fu_2_a = value_2;
-            fu_2_b = value_0;
-        end
-        5: begin
             fu_0_a = value_3;
             fu_0_b = value_1;
         end
@@ -110,6 +116,7 @@ always @(posedge clk) begin
         debug_fu_0 <= 0;
         debug_fu_1 <= 0;
         debug_fu_2 <= 0;
+        debug_fu_3 <= 0;
         debug_adder <= 0;
         debug_subtractor <= 0;
         debug_multiplier <= 0;
@@ -127,6 +134,7 @@ always @(posedge clk) begin
                     debug_fu_0 <= 0;
                     debug_fu_1 <= 0;
                     debug_fu_2 <= 0;
+                    debug_fu_3 <= 0;
                     debug_adder <= 0;
                     debug_subtractor <= 0;
                     debug_multiplier <= 0;
@@ -136,33 +144,30 @@ always @(posedge clk) begin
                 value_0 <= fu_0_result;
                 debug_fu_0 <= fu_0_result;
                 debug_adder <= fu_0_result;
+                value_1 <= fu_1_result;
+                debug_fu_1 <= fu_1_result;
+                debug_adder <= fu_1_result;
                 state <= 2;
             end
             2: if (step) begin
-                value_1 <= fu_0_result;
-                debug_fu_0 <= fu_0_result;
-                debug_adder <= fu_0_result;
+                value_2 <= fu_2_result;
+                debug_fu_2 <= fu_2_result;
+                debug_multiplier <= fu_2_result;
                 state <= 3;
             end
             3: if (step) begin
-                value_2 <= fu_1_result;
-                debug_fu_1 <= fu_1_result;
-                debug_multiplier <= fu_1_result;
+                value_3 <= fu_3_result;
+                debug_fu_3 <= fu_3_result;
+                debug_subtractor <= fu_3_result;
                 state <= 4;
             end
             4: if (step) begin
-                value_3 <= fu_2_result;
-                debug_fu_2 <= fu_2_result;
-                debug_subtractor <= fu_2_result;
-                state <= 5;
-            end
-            5: if (step) begin
                 value_4 <= fu_0_result;
                 debug_fu_0 <= fu_0_result;
                 debug_adder <= fu_0_result;
                 busy <= 0;
                 done <= 1;
-                state <= 6;
+                state <= 5;
             end
             FINISH: begin
                 busy <= 0;

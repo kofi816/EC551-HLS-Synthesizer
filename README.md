@@ -35,6 +35,11 @@ A simplified High-Level Synthesis (HLS) tool that converts arithmetic equations 
 3. The generator writes **only `output/generated_design.v`** by default. It does
    not generate or overwrite the reusable sources in `rtl/`.
 
+The generator prints the output equation, its SSA source and `final_result` port,
+primary inputs, execution cycle count, and reusable synthesis top. It does not
+compute a numeric result during generation: input values are loaded at runtime
+using UART, and `G` runs the FPGA computation.
+
 All board inputs, stored values, and arithmetic results are **8-bit unsigned**
 values, ranging from **0 to 255**. Arithmetic wraps modulo 256: `255 + 1` becomes
 `0`, and `0 - 1` becomes `255`. Decimal display does not change the arithmetic width.

@@ -152,7 +152,8 @@ def main():
         width = 8
         default = Path(__file__).resolve().parents[1] / "output" / "generated_design.v"
         output = Path(input(f"Output Verilog file [{default}]: ").strip() or default)
-        dag = build_dag(convert_to_ssa(parse_file(path)))
+        equations = parse_file(path)
+        dag = build_dag(convert_to_ssa(equations))
         schedule = schedule_dag(dag, mode, resources, bound)
         allocation = bind_resources(dag, schedule, resources)
         source = generate_verilog(dag, schedule, allocation, width)
@@ -163,6 +164,14 @@ def main():
         return 1
     print(f"Generated Verilog: {output}")
     print("Reusable support modules: rtl/ (add these separately to the FPGA project)")
+    final_equation = equations[-1]
+    print(f"Output equation: {final_equation['result']} = "
+          f"{final_equation['operand1']} {final_equation['operator']} {final_equation['operand2']}")
+    print(f"Output signal: final_result (from {list(dag)[-1]}, unsigned {width}-bit)")
+    print(f"Primary inputs: {', '.join(get_primary_inputs(dag))}")
+    print(f"Execution cycles: {max(schedule.values()) + 1} (after start)")
+    print("Numeric result: load inputs over UART, then send G; read the first numeric reply field")
+    print("FPGA synthesis top: fpga_uart_top (rtl/fpga_uart_top.v)")
     print(f"Hardware counts: {allocation['resource_counts']}")
     print("Board ports: clk, uart_rx, uart_tx, led[7:0]")
     return 0
