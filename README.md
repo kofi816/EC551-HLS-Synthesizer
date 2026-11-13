@@ -591,13 +591,6 @@ Aaron — Scheduling & Hardware Generation
 	•	Vivado synthesis and FPGA deployment
 	•	Scheduler and RTL testing
 
-Shared
-	•	Define interfaces between modules
-	•	End-to-end integration and debugging
-	•	Testbench development and verification
-	•	Final FPGA validation
-	•	README documentation and 30-minute demo preparation
-
 
 
     EC551-HLS-Synthesizer/
@@ -632,3 +625,13 @@ Shared
     ├── tb_arithmetic.v
     ├── tb_arithmetic_unit.v
     └── tb_manual_clk_step.v
+
+
+
+## AI Usage Disclosure
+
+AI was used as a supporting tool during the development of this project for the following purposes:
+
+- **Testing:** Assisted with the generation of unit tests.
+- **Documentation:** Assisted with README documentation, code comments, and explanations.
+- **Parser implementation:** Provided implementation and debugging assistance for functions.
